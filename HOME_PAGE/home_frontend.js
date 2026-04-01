@@ -207,7 +207,7 @@ function createTaskElement(data) {
         uploadfile.addEventListener("change",async (event)=> {
             
             const file=event.target.files[0];
-if (!file) return;
+            if (!file) return;
             console.log(file);
 
             //CONVERTING FILE USER UPLOADED TO HASH
@@ -215,6 +215,8 @@ if (!file) return;
             // CONVERT FILE TO ARRAYBUFFER()
             const buffer=await file.arrayBuffer();
 
+            let todaydate = new Date().getDate();
+            
             //CONVERT BUFFER TO SHA-256
             const SHA= await crypto.subtle.digest("SHA-256", buffer);//Take this binary data, apply SHA-256 hashing, wait for the result, and store it.
 
@@ -226,6 +228,10 @@ if (!file) return;
         .join("");
 
         console.log("SHA-256 Hash:", hashHex);
+        let datebox=document.querySelector(`[data-day="${todaydate}"]`);
+            if(datebox){
+                datebox.style.backgroundColor="red";
+            }
              });
              
 
@@ -233,6 +239,11 @@ if (!file) return;
              //OPTION 3: INTEGRATE API
         let api=document.createElement("button");
         api.innerText="INTEGRATE API 🔌";
+
+        //INTEGRATE API FUNCTIONALITY
+        api.addEventListener("click", function(){
+            alert("Feature is under construction");
+        });
 
         option_box.appendChild(manualbtn);
         option_box.appendChild(uploadproof);

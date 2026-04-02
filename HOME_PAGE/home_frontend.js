@@ -45,8 +45,15 @@ function generatecalender(){
 
 //ALWAYS LOAD CALENDER
 
-document.addEventListener("DOMContentLoaded", function(){
+document.addEventListener("DOMContentLoaded",async function(){
     generatecalender();
+     //LOAD OLD TASKS
+     let response = await fetch("/get_tasks");
+     let tasks= await response.json();
+     tasks.forEach(task => {
+        createTaskElement(task);
+     });
+
 });//THIS LINE MEANS WHEN HTML IS LOADED AND DOM IS READY, RUN THE FUNCTION
 
 let add_task = document.getElementById("add_task");
@@ -91,6 +98,7 @@ save_task.addEventListener("click", async function (e) {
         alert("SERVER ERROR");
     }
 });
+
 
 
 // ✅ FUNCTION TO CREATE TASK (IMPORTANT)

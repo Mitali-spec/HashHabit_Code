@@ -65,8 +65,9 @@ app.post("/login",async function(req,res){
         return res.send("user not found");
     }
     if(existing_user.password===password){
-        // ✅ REDIRECT
-    res.redirect("/HOME_PAGE/home_page.html");
+       
+        req.session.userId = existing_user._id; //Store the logged-in user’s ID inside the session object on the server
+         res.redirect("/HOME_PAGE/home_page.html");
 
     }
     else{

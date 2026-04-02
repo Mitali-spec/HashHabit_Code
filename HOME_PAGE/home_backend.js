@@ -1,6 +1,13 @@
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
+const session=require("express-session");
+
+app.use(session({   //Use express-session as middleware for every request in my app
+    secret:"secret-key", //Acts like a password for sessions
+    resave:false,   //Don’t rewrite the same session again and again unless something actually changed.
+    saveUninitialized: false    //Don’t create a session until we actually store something in it (like after login)
+}));
 
 // ✅ MIDDLEWARE
 app.use(express.urlencoded({ extended: true }));
@@ -19,10 +26,8 @@ mongoose.connect("mongodb://127.0.0.1:27017/users_goal")
 
 // ✅ SCHEMA
 const schema = new mongoose.Schema({
-    add_task: {
-        type: String,
-        required: true
-    }
+    add_task: String,
+    userID: String
 });
 
 // ✅ MODEL
@@ -37,7 +42,11 @@ app.post("/add_task", async (req, res) => {
             return res.status(400).json({ success: false });
         }
 
-        const new_task = new Task({ add_task: taskText });
+        const new_task = new Task({
+             add_task: req.body.add_task,
+             userID:req.session.userID  //LINK TASK TO USER
+            
+            });
         await new_task.save();
 
         res.status(201).json(new_task);
@@ -48,6 +57,14 @@ app.post("/add_task", async (req, res) => {
     }
 });
 
+
+app.get("/get-tasks", async(req,res) => {
+    if(!req.session.userID){
+        return res.status(401).json([]);
+    }
+    const tasks=await Task.find({userID: req.session.userID});
+    res.json(tasks);
+});
 // ================= DELETE =================
 app.delete("/delete_task/:id", async (req, res) => {
     try {
@@ -86,6 +103,13 @@ app.put("/update_task/:id", async (req, res) => {
         console.log(err);
         res.status(500).json({ success: false });
     }
+});
+//PROTECT HOMEPAGE
+app.get("/HOME_PAGE/home_page.html", (req, res) => {
+    if (!req.session.userId) {
+        return res.redirect("/");
+    }
+    res.sendFile(__dirname + "/HOME_PAGE/home_page.html");
 });
 
 // ================= SERVER =================
